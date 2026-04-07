@@ -8,12 +8,11 @@ function json(res, status, data) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return json(res, 405, { ok: false, message: "Method not allowed" });
-  }
-
   try {
-    const { code } = req.body || {};
+    const code =
+      req.method === "GET"
+        ? req.query?.code
+        : req.body?.code;
 
     if (!code || typeof code !== "string") {
       return json(res, 200, { ok: false, message: "缺少授权码" });
@@ -35,7 +34,7 @@ export default async function handler(req, res) {
 
     return json(res, 200, {
       ok: true,
-      message: "授权有效",
+      code: cleanCode,
       remaining
     });
   } catch (err) {
